@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 40px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #218838;
+            transform: scale(1.02);
+        }
+
+        table {
+            width: 100%;
+            max-width: 600px;
+            margin-top: 20px;
+            border-collapse: collapse;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th,
+        table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #ddd;
+        }
+    </style>
+</head>
+<body>
+<h1>User Management</h1>
+
+<form id="userForm" th:action="@{/users/save}" th:object="${user}" method="post">
+    <div th:if="${errorMessage}" style="color:red;">
+        <p th:text="${errorMessage}"></p>
+    </div>
+    <input type="hidden" th:field="*{id}" id="userId"/>
+    <label for="username">Username:</label>
+    <input type="text" id="username" th:field="*{username}" /><br/>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" th:field="*{password}" /><br/>
+
+    <label for="active">
+        <input type="checkbox" id="active" th:field="*{active}" /> Active
+    </label><br/>
+
+    <button type="submit" id="submitButton" th:text="${user.id != null ? 'Update User' : 'Add User'}">
+        Add User
+    </button>
+</form>
+
+
+<script>
+    document.getElementById('userForm').addEventListener('submit', function(event) {
+        const userIdField = document.getElementById('userId');
+
+        // Allow the form to submit normally
+        setTimeout(function() {
+            // Clear the fields after the form has been submitted
+            userIdField.value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('active').checked = false;
+
+            // Reset the button text to 'Add User'
+            document.getElementById('submitButton').innerText = 'Add User';
+        }, 100);
+    });
+</script>
+
+<h2>List of Users</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Active</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.username}">Username</td>
+        <td th:text="${user.password}">Password</td>
+        <td th:text="${user.active ? 'Yes' : 'No'}">Active</td>
+        <td class="action-buttons">
+            <!-- Update button/link -->
+            <a th:href="@{/users/edit/{id}(id=${user.id})}" class="btn btn-primary">Edit</a>
+            <!-- Delete button -->
+            <a th:href="@{/users/delete/{id}(id=${user.id})}" class="btn btn-danger">Delete</a>
+<!--            <a th:href="@{/users/delete/{id}(id=${user.id})}" method="post">-->
+<!--                <button type="submit" class="delete-button">Delete</button>-->
+<!--            </a>-->
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
